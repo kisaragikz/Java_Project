@@ -24,6 +24,7 @@ public class MageTowerManager {
     private Image[] mageSprite;
     private ArrayList<MageTower> mages = new ArrayList<>();
     private Images images;
+    private int id;
     public MageTowerManager(Playing playing){
         this.playing = playing;
         images = new Images();
@@ -41,54 +42,62 @@ public class MageTowerManager {
     private void drawMageSprite() {
         mageSprite = new Image[4];
         mageSprite[0] = images.wind_mage;
-        mageSprite[1] = images.ice_mage;
-        mageSprite[2] = images.earth_mage;
-        mageSprite[3] = images.fire_mage;
+        mageSprite[1] = images.fire_mage;
+        mageSprite[2] = images.ice_mage;
+        mageSprite[3] = images.earth_mage;
+        
         
     }
     
     public void update() {
-        spellEnemy();
-    }
-//    private void spellEnemy() {
-//        for(MageTower m:mages){
-//            for(Enemy e: playing.getEnemyManager().getEnemies()){
-//                if(e.isAlive()){
-//                    System.out.println();
-//                    if(isEnemyInRange(m,e)){
-//                        //attack
-//
-//                        e.attacked(1);
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-    private void spellEnemy() {
         for(MageTower m:mages){
-            for(Enemy e: playing.getEnemyManager().getEnemies()){
-                if(e.isAlive()){
-                    // Calculate the distance between the tower and the enemy
-                    int distance = Utilz.GetHypoDistance(m.getX(), m.getY(), e.getX(), e.getY());
+            m.update();
+            spellEnemy(m);
+        }
+    }
+    private void spellEnemy(MageTower m) {
+        for(Enemy e: playing.getEnemyManager().getEnemies()){
+            if(e.isAlive()){
+                if(isEnemyInRange(m,e)){
+                    if(m.isCooldownOver()){
+                        //attack
+                        playing.shootEnemy(m,e);
+                        m.resetCooldown();
 
-                    // Check if the enemy is in range of the tower
-                    if(distance < m.getRange()) {
-                        // Attack the enemy
-                        e.attacked(1);
                     }
                 }
             }
         }
     }
-
-
-//    private boolean isEnemyInRange(MageTower m, Enemy e) {
-//        int range = Utilz.GetHypoDistance(m.getX(), m.getY(), e.getX(), e.getY());
-////        System.out.println(e.getX());
-//        return range < m.getRange();
-//    }
+    private boolean isEnemyInRange(MageTower m, Enemy e) {
+        int range = Utilz.GetHypoDistance(m.getX(), m.getY(), e.getX(), e.getY());
+        return range < m.getRange();
+    }
     
+    public void addTower(MageTower selectedTower, int x, int y) {
+        mages.add(new MageTower(x,y,selectedTower.getTowerType(),id++));
+    }
+    public void upgradeTower(MageTower mageInfro) {
+        for(MageTower m:mages){
+            if(m.getId() == mageInfro.getId()){
+                m.upgradeTower();
+            }
+        }
+    }
+    public void sellTower(MageTower mageInfro) {
+        for(int i = 0;i<mages.size();i++){
+            if(mageInfro.getId() == mages.get(i).getId()){
+                mages.remove(i);
+            }
+        }
+    }
+    public MageTower getPosTower(int x, int y) {
+        for(MageTower m:mages)
+            if(m.getX() == x)
+                if(m.getY() == y)
+                    return m;
+        return null;
+    }
     public BufferedImage[] getMageButtonSprite() {
         return mageButtonSprite;
     }
@@ -97,18 +106,9 @@ public class MageTowerManager {
         return mageSprite;
     }
 
-    public void addTower(MageTower selectedTower, int x, int y) {
-        mages.add(new MageTower(x,y,selectedTower.getTowerType()));
-    }
+    
 
-    public MageTower getPosTower(int x, int y) {
-        for(MageTower m:mages)
-            if(m.getX() == x)
-                if(m.getY() == y)
-                    return m;
-        return null;
-    }
-
+    
     
 
    

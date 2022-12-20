@@ -16,22 +16,21 @@ import javax.imageio.ImageIO;
  *
  * @author sahad
  */
-public class MyButton {
+public class MyTextButton {
     private int x,y,width,height,id;
     private String text;
-    private BufferedImage img;
     private Rectangle bounds;
     private boolean mouseOver,mousePressed,mouseReleased;
-    public MyButton(BufferedImage img,int x,int y,int width,int height){
-        this.img = img;
+    public MyTextButton(String text,int x,int y,int width,int height){
+        this.text = text;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         initBounds();
     }
-    public MyButton(BufferedImage img,int x,int y,int width,int height,int id){
-        this.img = img;
+    public MyTextButton(String text,int x,int y,int width,int heigh,int id){
+        this.text = text;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -40,22 +39,25 @@ public class MyButton {
         initBounds();
     }
     
-    public void setImage(BufferedImage img){
-        this.img = img;
-    }
     private void initBounds(){
         this.bounds = new Rectangle(x,y,width,height);
     }
     public void draw(Graphics g){
+        if (mouseOver)
+            g.setColor(Color.gray);
+        else
+            g.setColor(Color.WHITE);
         if(mousePressed){
-            g.drawImage(img, x+2, y+1,width-4,height-2,null);
+            g.setColor(Color.GREEN);
         }
-        else{
-            g.drawImage(img, x, y,width,height,null);
-        }
-        if(mouseOver){
-            g.drawImage(img, x-2, y-1,width+4,height+2,null);
-        }
+        g.fillRect(x, y, width, height);
+        
+        int w = g.getFontMetrics().stringWidth(text);
+        int h = g.getFontMetrics().getHeight();
+        g.setColor(Color.BLACK);
+	g.drawString(text, x - w / 2 + width / 2, y + h/4  + height / 2);	
+        
+        
     }
     public Rectangle getBounds(){
         return bounds;
@@ -75,6 +77,10 @@ public class MyButton {
 
     public int getId() {
         return id;
+    }
+
+    public boolean isMouseOver() {
+        return mouseOver;
     }
     
     
